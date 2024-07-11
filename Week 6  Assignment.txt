@@ -1,0 +1,169 @@
+--Week 6 Assignment
+
+1757. Recyclable and Low Fat Products
+#Code
+select product_id
+from products
+where low_fats = 'Y' and recyclable = 'Y'
+
+584. Find Customer Referee
+#Code
+# Write your MySQL query statement below
+select name from customer
+where referee_id != 2 or referee_id is null;
+
+595. Big Countries
+#Code
+SELECT name, population, area FROM World
+WHERE population >= 25000000 OR area >= 3000000;
+
+1683. Invalid Tweets
+#Code
+SELECT tweet_id FROM Tweets
+WHERE LENGTH(content) > 15;
+
+185. Department Top Three Salaries
+# Code
+SELECT d.name as Department,
+e.name as Employee,
+e.salary as Salary
+FROM Department d, Employee e
+WHERE(
+    SELECT COUNT(distinct Salary)
+    FROM Employee
+    WHERE Salary > e.salary AND departmentId = d.Id
+) < 3 AND e.departmentId = d.Id
+ORDER BY d.id, e.salary desc;
+
+1378. Replace Employee ID With The Unique Identifier
+#Code
+SELECT
+EmployeeUNI.unique_id, Employees.name
+FROM Employees
+LEFT JOIN EmployeeUNI on Employees.id = EmployeeUNI.id
+
+1068. Product Sales Analysis I
+#Code
+SELECT product_name, year, price FROM Sales
+INNER JOIN Product
+ON Sales.product_id = Product.product_id;
+
+
+1581. Customer Who Visited but Did Not Make Any Transactions
+#Code
+SELECT v.customer_id, COUNT(v.visit_id) AS count_no_trans 
+from Visits v 
+LEFT JOIN Transactions t 
+ON v.visit_id = t.visit_id  
+WHERE t.amount IS NULL 
+GROUP BY v.customer_id;
+
+1661. Average Time of Process per Machine
+#Code
+SELECT a.machine_id, 
+       ROUND(AVG(b.timestamp - a.timestamp), 3) AS processing_time
+FROM Activity a, 
+     Activity b
+WHERE 
+    a.machine_id = b.machine_id
+AND 
+    a.process_id = b.process_id
+AND 
+    a.activity_type = 'start'
+AND 
+    b.activity_type = 'end'
+GROUP BY machine_id
+
+577. Employee Bonus
+#Code
+SELECT
+    Employee.name, Bonus.bonus
+FROM
+    Employee
+        LEFT JOIN
+    Bonus ON Employee.empid = Bonus.empid
+WHERE
+    bonus < 1000 OR bonus IS NULL;
+
+1280. Students and Examinations
+#Code
+SELECT *, 
+    (select count(student_id) from examinations e where e.student_id = s.student_id 
+        and e.subject_name = sn.subject_name) as attended_exams
+FROM Students s
+CROSS JOIN Subjects sn
+ORDER BY student_id, subject_name;
+
+570. Managers with at Least 5 Direct Reports
+#Code
+SELECT e.name
+FROM Employee AS e 
+INNER JOIN Employee AS m ON e.id=m.managerId 
+GROUP BY m.managerId 
+HAVING COUNT(m.managerId) >= 5;
+
+1934. Confirmation Rate
+#Code
+select s.user_id, round(avg(if(c.action="confirmed",1,0)),2) as confirmation_rate
+from Signups as s left join Confirmations as c on s.user_id= c.user_id group by user_id;
+
+620. Not Boring Movies
+#Code
+SELECT id, movie, description, rating
+FROM Cinema
+WHERE id%2 = 1 and description <> 'boring'
+ORDER BY rating DESC;
+
+1251. Average Selling Price
+#Code
+SELECT p.product_id, IFNULL(ROUND(SUM(p.price*u.units)/SUM(u.units), 2), 0) as average_price
+FROM Prices p
+LEFT JOIN UnitsSold u
+ON p.product_id = u.product_id
+and u.purchase_date >= p.start_date
+and u.purchase_date <= p.end_date
+GROUP BY p.product_id;
+
+1075. Project Employees I
+#Code
+SELECT p.project_id, ROUND(AVG(e.experience_years),2) AS average_years
+FROM Project p 
+LEFT JOIN Employee e
+ON p.employee_id = e.employee_id
+GROUP BY p.project_id;
+
+1633. Percentage of Users Attended a Contest]
+#Code
+select 
+contest_id, 
+round(count(distinct user_id) * 100 /(select count(user_id) from Users) ,2) as percentage
+from  Register
+group by contest_id
+order by percentage desc,contest_id;
+
+1211. Queries Quality and Percentage
+#Code
+select distinct query_name , round(avg(rating/position) over(partition by query_name) ,2) as quality,
+round(avg(case when rating<3 then 1 else 0 end) over(partition by query_name)*100,2) as poor_query_percentage from queries
+where query_name is not null;
+
+1193. Monthly Transactions I
+#Code
+SELECT  DATE_FORMAT(trans_date, '%Y-%m') AS month, country, 
+        COUNT(id) AS trans_count, 
+        SUM(IF(state = 'approved',1,0)) AS approved_count,
+        SUM(amount) AS trans_total_amount,
+        SUM(IF(state = 'approved',amount,0)) AS approved_total_amount
+FROM  Transactions
+GROUP BY month,country;
+
+1174. Immediate Food Delivery II
+#Code
+Select 
+    round(avg(order_date = customer_pref_delivery_date)*100, 2) as immediate_percentage
+from Delivery
+where (customer_id, order_date) in (
+  Select customer_id, min(order_date) 
+  from Delivery
+  group by customer_id
+);
